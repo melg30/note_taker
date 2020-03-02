@@ -8,6 +8,7 @@ const fs = require("fs");
 // =============================================================
 const app = express();
 const PORT = process.env.PORT || 3000;
+let data = JSON.parse(fs.readFileSync("./db/db.json", "utf8"));
 
 // Sets up the Express app to handle data parsing
 app.use(express.urlencoded({ extended: true }));
@@ -32,18 +33,17 @@ app.get("/api/notes", function(req, res) {
   return res.json(data);
 });
 
-// receive new note to save on the request body, add it to the `db.json` file,
-// and then return the new note to the client.
+// receive new note to save on the request body, add it to the `db.json` file
 app.post("/api/notes", function(req, res) {
   data.push(req.body);
-  fs.writeFile("./json/db.json", JSON.stringify(data), function(err) {
+  fs.writeFile("./db/db.json", JSON.stringify(data), function(err) {
     if (err) throw err;
     console.log("New post successful!");
   });
   return res.json(data);
 });
 
-// remove note with given id
+// remove note
 app.delete("/api/notes/:id", function(req, res) {
   data = data.filter(function(data) {
     if (req.params.id === data.id) {
@@ -52,7 +52,7 @@ app.delete("/api/notes/:id", function(req, res) {
     return true;
   });
 
-  res.writeFile("./json/db.json", JSON.stringify(data), function(err) {
+  res.writeFile("./db/db.json", JSON.stringify(data), function(err) {
     if (err) throw err;
     console.log("Note successfully deleted!");
   });
