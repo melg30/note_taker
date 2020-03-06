@@ -6,7 +6,7 @@ const fs = require("fs");
 
 // Sets up the Express App
 // =============================================================
-const app = express();
+let app = express();
 const PORT = process.env.PORT || 3000;
 let data = JSON.parse(fs.readFileSync("./db/db.json", "utf8"));
 
@@ -30,7 +30,12 @@ app.get("/notes", function(req, res) {
 
 // read db.json file and return all saved notes as JSOn
 app.get("/api/notes", function(req, res) {
-  return res.json(data);
+  fs.readFile("./db/db.json", "utf8", (err, data) => {
+    console.log(data);
+    if (err) throw err;
+    const note = JSON.parse(data);
+    return res.json(note);
+  });
 });
 
 // receive new note to save on the request body, add it to the `db.json` file
@@ -45,6 +50,7 @@ app.post("/api/notes", function(req, res) {
 
 // remove note
 app.delete("/api/notes/:id", function(req, res) {
+  // let id = req.params.id;
   data = data.filter(function(data) {
     if (req.params.id === data.id) {
       return false;
@@ -52,10 +58,11 @@ app.delete("/api/notes/:id", function(req, res) {
     return true;
   });
 
-  res.writeFile("./db/db.json", JSON.stringify(data), function(err) {
+  fs.writeFile("./db/db.json", JSON.stringify(data), function(err) {
     if (err) throw err;
-    console.log("Note successfully deleted!");
+    res.end();
   });
+
   return res.json(data);
 });
 

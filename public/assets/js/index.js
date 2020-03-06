@@ -17,6 +17,8 @@ var getNotes = function() {
 
 // A function for saving a note to the db
 var saveNote = function(note) {
+  console.log(note);
+
   return $.ajax({
     url: "/api/notes",
     data: note,
@@ -51,12 +53,15 @@ var renderActiveNote = function() {
 
 // Get the note data from the inputs, save it to the db and update the view
 var handleNoteSave = function() {
+  let num = Date.now();
   var newNote = {
     title: $noteTitle.val(),
-    text: $noteText.val()
+    text: $noteText.val(),
+    id: num
   };
 
   saveNote(newNote).then(function(data) {
+    console.log(data);
     getAndRenderNotes();
     renderActiveNote();
   });
